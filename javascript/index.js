@@ -14,10 +14,12 @@ const shouldMigrate = !fs.existsSync(filename)
  *
  */
 function * generateContacts () {
- // TODO
-  yield [`name-1`, `email-1@domain.tld`]
-  yield [`name-2`, `email-2@domain.tld`]
-  yield [`name-3`, `email-3@domain.tld`]
+  let index = 1
+
+  while (index <= numContacts) {
+    yield [`name-${index}`, `email-${index}'@domain.tld`]
+    index++
+  }
 }
 
 const migrate = async (db) => {
@@ -34,7 +36,14 @@ const migrate = async (db) => {
 
 const insertContacts = async (db) => {
   console.log('Inserting contacts ...')
-  // TODO
+
+  const contacts = generateContacts()
+
+  for (const contact of contacts) {
+    const res = await db.run('INSERT INTO contacts (name, email) VALUES (?, ?)', contact)
+  }
+
+  console.log('Done inserting contacts')
 }
 
 const queryContact = async (db) => {
@@ -57,6 +66,7 @@ const queryContact = async (db) => {
   if (shouldMigrate) {
     await migrate(db)
   }
+
   await insertContacts(db)
   await queryContact(db)
   await db.close()
